@@ -28,15 +28,18 @@ const SEED_ACCOUNT = {
   address: "30 South Colonnade, E14 5HX, London, United Kingdom",
 };
 
+const DATA_VERSION = "v2";
+
 async function initIfNeeded(store) {
-  const existing = await store.get("account", { type: "json" });
-  if (!existing) {
+  const version = await store.get("data_version");
+  if (version !== DATA_VERSION) {
     await store.setJSON("account", SEED_ACCOUNT);
     await store.setJSON("transactions", SEED_TRANSACTIONS);
     await store.setJSON("activities", [
       { id: "act_001", action: "account_created", detail: "Account opened for Margaret Stannard", timestamp: "2026-03-30T09:00:00Z" },
       { id: "act_002", action: "deposit", detail: "Initial deposit of £100,000.00", timestamp: "2026-03-30T09:00:00Z" },
     ]);
+    await store.set("data_version", DATA_VERSION);
   }
 }
 
