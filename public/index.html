@@ -3,38 +3,43 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BOA - Online Banking</title>
+  <title>Revolut - Online Banking</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
     :root {
-      --primary: #0c2340;
-      --primary-light: #163a64;
-      --accent: #00875a;
-      --accent-light: #00a86b;
-      --danger: #de350b;
-      --text: #172b4d;
-      --text-secondary: #6b778c;
-      --bg: #f4f5f7;
+      --primary: #0d0d0d;
+      --primary-light: #1a1a2e;
+      --accent: #0066ff;
+      --accent-light: #3385ff;
+      --success: #00c853;
+      --success-light: #69f0ae;
+      --danger: #f44336;
+      --warning: #ff9800;
+      --text: #1a1a1a;
+      --text-secondary: #6b7280;
+      --bg: #f5f5f7;
       --surface: #ffffff;
-      --border: #dfe1e6;
-      --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
-      --shadow-lg: 0 10px 30px rgba(0,0,0,0.1);
-      --radius: 12px;
+      --border: #e5e7eb;
+      --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-lg: 0 10px 40px rgba(0,0,0,0.08);
+      --radius: 14px;
     }
 
     [data-theme="dark"] {
-      --primary: #0c2340;
-      --primary-light: #1a3f6f;
-      --accent: #36b37e;
-      --accent-light: #57d9a3;
-      --text: #e1e4e8;
-      --text-secondary: #8b949e;
-      --bg: #0d1117;
-      --surface: #161b22;
-      --border: #30363d;
+      --primary: #0d0d0d;
+      --primary-light: #1a1a2e;
+      --accent: #3385ff;
+      --accent-light: #5599ff;
+      --success: #00e676;
+      --success-light: #69f0ae;
+      --text: #f0f0f0;
+      --text-secondary: #9ca3af;
+      --bg: #0a0a0a;
+      --surface: #141414;
+      --border: #2a2a2a;
       --shadow: 0 1px 3px rgba(0,0,0,0.3);
-      --shadow-lg: 0 10px 30px rgba(0,0,0,0.4);
+      --shadow-lg: 0 10px 40px rgba(0,0,0,0.4);
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -53,13 +58,13 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: linear-gradient(145deg, #0c2340 0%, #163a64 50%, #00875a 100%);
+      background: linear-gradient(145deg, #0d0d0d 0%, #1a1a2e 50%, #0066ff 100%);
       padding: 20px;
     }
 
     .login-card {
       background: var(--surface);
-      border-radius: 20px;
+      border-radius: 24px;
       padding: 48px 40px;
       width: 100%;
       max-width: 420px;
@@ -72,21 +77,23 @@
     }
 
     .login-brand .bank-icon {
-      width: 56px;
-      height: 56px;
-      background: linear-gradient(135deg, #0c2340, #00875a);
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, #0066ff, #0d0d0d);
       border-radius: 16px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       font-size: 28px;
       margin-bottom: 16px;
+      color: white;
     }
 
     .login-brand h1 {
-      font-size: 24px;
-      font-weight: 700;
+      font-size: 26px;
+      font-weight: 800;
       color: var(--text);
+      letter-spacing: -0.5px;
     }
 
     .login-brand p {
@@ -109,11 +116,11 @@
       margin-bottom: 8px;
     }
 
-    .form-field input {
+    .form-field input, .form-field select, .form-field textarea {
       width: 100%;
       padding: 14px 16px;
       border: 2px solid var(--border);
-      border-radius: 10px;
+      border-radius: 12px;
       font-size: 15px;
       font-family: inherit;
       background: var(--bg);
@@ -121,7 +128,12 @@
       transition: border-color 0.2s;
     }
 
-    .form-field input:focus {
+    .form-field textarea {
+      resize: vertical;
+      min-height: 60px;
+    }
+
+    .form-field input:focus, .form-field select:focus, .form-field textarea:focus {
       outline: none;
       border-color: var(--accent);
     }
@@ -132,7 +144,7 @@
       justify-content: center;
       padding: 14px 24px;
       border: none;
-      border-radius: 10px;
+      border-radius: 12px;
       font-size: 15px;
       font-weight: 600;
       font-family: inherit;
@@ -148,12 +160,27 @@
 
     .btn-primary:hover { background: var(--accent-light); }
 
+    .btn-success {
+      background: var(--success);
+      color: white;
+    }
+
+    .btn-success:hover { opacity: 0.9; }
+
     .btn-danger {
       background: var(--danger);
       color: white;
     }
 
     .btn-danger:hover { opacity: 0.9; }
+
+    .btn-outline {
+      background: transparent;
+      border: 2px solid var(--border);
+      color: var(--text);
+    }
+
+    .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
 
     .login-error {
       color: var(--danger);
@@ -185,14 +212,15 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      font-weight: 700;
+      font-weight: 800;
       font-size: 18px;
+      letter-spacing: -0.3px;
     }
 
     .topbar-brand .icon {
       width: 32px;
       height: 32px;
-      background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(0,135,90,0.6));
+      background: linear-gradient(135deg, #0066ff, rgba(255,255,255,0.2));
       border-radius: 8px;
       display: flex;
       align-items: center;
@@ -325,8 +353,8 @@
 
     /* Balance hero */
     .balance-hero {
-      background: linear-gradient(135deg, #0c2340 0%, #163a64 60%, #00875a 100%);
-      border-radius: 16px;
+      background: linear-gradient(135deg, #0d0d0d 0%, #1a1a2e 60%, #0066ff 100%);
+      border-radius: 20px;
       padding: 32px 28px;
       color: white;
       margin-bottom: 20px;
@@ -341,7 +369,7 @@
       right: -20%;
       width: 300px;
       height: 300px;
-      background: radial-gradient(circle, rgba(255,255,255,0.06) 0%, transparent 70%);
+      background: radial-gradient(circle, rgba(0,102,255,0.15) 0%, transparent 70%);
       border-radius: 50%;
     }
 
@@ -354,7 +382,7 @@
     }
 
     .balance-amount {
-      font-size: 40px;
+      font-size: 42px;
       font-weight: 800;
       margin: 8px 0 4px;
       letter-spacing: -1px;
@@ -364,6 +392,31 @@
       font-size: 14px;
       opacity: 0.7;
     }
+
+    .balance-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .balance-actions button {
+      flex: 1;
+      padding: 10px 16px;
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 10px;
+      background: rgba(255,255,255,0.1);
+      color: white;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.2s;
+      backdrop-filter: blur(10px);
+    }
+
+    .balance-actions button:hover { background: rgba(255,255,255,0.2); }
 
     /* Quick stats */
     .stats-row {
@@ -408,9 +461,9 @@
     .txn-item:last-child { border-bottom: none; }
 
     .txn-icon {
-      width: 40px;
-      height: 40px;
-      border-radius: 10px;
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -418,25 +471,13 @@
       flex-shrink: 0;
     }
 
-    .txn-icon.deposit { background: #e3fcef; }
-    .txn-icon.transfer { background: #deebff; }
-    .txn-icon.fee { background: #fff3e0; }
+    .txn-icon.deposit { background: rgba(0,200,83,0.12); }
+    .txn-icon.transfer { background: rgba(0,102,255,0.12); }
+    .txn-icon.fee { background: rgba(255,152,0,0.12); }
 
-    [data-theme="dark"] .txn-icon.deposit { background: #1a3a2a; }
-    [data-theme="dark"] .txn-icon.transfer { background: #1a2a3a; }
-    [data-theme="dark"] .txn-icon.fee { background: #3a2a1a; }
-
-    .txn-badge {
-      display: inline-block;
-      font-size: 10px;
-      font-weight: 600;
-      padding: 1px 6px;
-      border-radius: 4px;
-      background: rgba(245,158,11,0.15);
-      color: #f59e0b;
-      margin-left: 6px;
-      vertical-align: middle;
-    }
+    [data-theme="dark"] .txn-icon.deposit { background: rgba(0,200,83,0.15); }
+    [data-theme="dark"] .txn-icon.transfer { background: rgba(0,102,255,0.15); }
+    [data-theme="dark"] .txn-icon.fee { background: rgba(255,152,0,0.15); }
 
     .txn-details { flex: 1; min-width: 0; }
 
@@ -461,7 +502,7 @@
       white-space: nowrap;
     }
 
-    .txn-amount.positive { color: var(--accent); }
+    .txn-amount.positive { color: var(--success); }
     .txn-amount.negative { color: var(--danger); }
 
     /* Transfer form */
@@ -483,9 +524,9 @@
     }
 
     .recipient-option:hover { border-color: var(--text-secondary); }
-    .recipient-option.selected { border-color: var(--accent); background: rgba(0,135,90,0.04); }
+    .recipient-option.selected { border-color: var(--accent); background: rgba(0,102,255,0.04); }
 
-    [data-theme="dark"] .recipient-option.selected { background: rgba(54,179,126,0.08); }
+    [data-theme="dark"] .recipient-option.selected { background: rgba(0,102,255,0.08); }
 
     .recipient-name {
       font-weight: 600;
@@ -499,24 +540,21 @@
     }
 
     .transfer-msg {
-      padding: 12px 16px;
-      border-radius: 8px;
+      padding: 14px 18px;
+      border-radius: 10px;
       font-size: 14px;
       font-weight: 500;
       margin-top: 16px;
       display: none;
     }
 
-    .transfer-msg.success { display: block; background: #e3fcef; color: #006644; }
-    .transfer-msg.error { display: block; background: #ffebe6; color: #bf2600; }
-
-    [data-theme="dark"] .transfer-msg.success { background: #1a3a2a; color: #57d9a3; }
-    [data-theme="dark"] .transfer-msg.error { background: #3a1a1a; color: #ff8f73; }
+    .transfer-msg.success { display: block; background: rgba(0,200,83,0.1); color: #00c853; border: 1px solid rgba(0,200,83,0.2); }
+    .transfer-msg.error { display: block; background: rgba(244,67,54,0.1); color: #f44336; border: 1px solid rgba(244,67,54,0.2); }
 
     /* Virtual card */
     .virtual-card {
-      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-      border-radius: 16px;
+      background: linear-gradient(135deg, #0d0d0d 0%, #1a1a2e 50%, #0066ff 100%);
+      border-radius: 18px;
       padding: 28px 24px;
       color: white;
       position: relative;
@@ -540,8 +578,8 @@
     }
 
     .card-chip {
-      width: 40px;
-      height: 30px;
+      width: 42px;
+      height: 32px;
       background: linear-gradient(135deg, #d4af37, #f0d060);
       border-radius: 6px;
       margin-bottom: 20px;
@@ -580,19 +618,137 @@
       opacity: 0.9;
     }
 
-    /* Account details */
+    /* Account / Profile details */
     .detail-row {
       display: flex;
       justify-content: space-between;
+      align-items: flex-start;
       padding: 14px 0;
       border-bottom: 1px solid var(--border);
       font-size: 14px;
+      gap: 16px;
     }
 
     .detail-row:last-child { border: none; }
 
-    .detail-label { color: var(--text-secondary); }
-    .detail-value { font-weight: 600; }
+    .detail-label { color: var(--text-secondary); flex-shrink: 0; }
+    .detail-value { font-weight: 600; text-align: right; word-break: break-all; }
+
+    .profile-header {
+      text-align: center;
+      padding: 24px 0 20px;
+    }
+
+    .profile-avatar {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #0066ff, #0d0d0d);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 12px;
+    }
+
+    .profile-name {
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .profile-subtitle {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+
+    .section-divider {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--accent);
+      margin: 8px 0 4px;
+      padding-top: 8px;
+    }
+
+    /* Share details box */
+    .share-box {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 16px;
+    }
+
+    .share-box h4 {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+    }
+
+    .share-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      font-size: 13px;
+    }
+
+    .share-row .label { color: var(--text-secondary); }
+    .share-row .value { font-weight: 600; font-family: 'Inter', monospace; letter-spacing: 0.3px; }
+
+    .copy-btn {
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 12px;
+      transition: all 0.2s;
+    }
+
+    .copy-btn:hover { background: var(--accent-light); }
+
+    /* Receive payment info */
+    .receive-info {
+      background: rgba(0,102,255,0.04);
+      border: 1px solid rgba(0,102,255,0.15);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    [data-theme="dark"] .receive-info {
+      background: rgba(0,102,255,0.08);
+      border-color: rgba(0,102,255,0.2);
+    }
+
+    .receive-info h4 {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: var(--accent);
+    }
+
+    .receive-detail {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 0;
+      font-size: 13px;
+    }
+
+    .receive-detail .label { color: var(--text-secondary); }
+    .receive-detail .value { font-weight: 600; }
 
     /* Bottom nav (mobile) */
     .bottom-nav {
@@ -656,6 +812,7 @@
       .stats-row { grid-template-columns: 1fr; }
       .recipient-grid { grid-template-columns: 1fr; }
       .login-card { padding: 36px 24px; }
+      .balance-actions { flex-direction: column; }
     }
 
     .empty-state {
@@ -663,6 +820,39 @@
       padding: 40px 20px;
       color: var(--text-secondary);
     }
+
+    /* Tab pair buttons */
+    .tab-pair {
+      display: flex;
+      background: var(--bg);
+      border-radius: 12px;
+      padding: 4px;
+      margin-bottom: 20px;
+      border: 1px solid var(--border);
+    }
+
+    .tab-pair button {
+      flex: 1;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      background: transparent;
+      color: var(--text-secondary);
+      transition: all 0.2s;
+    }
+
+    .tab-pair button.active {
+      background: var(--accent);
+      color: white;
+      box-shadow: 0 2px 8px rgba(0,102,255,0.3);
+    }
+
+    .sub-section { display: none; }
+    .sub-section.active { display: block; }
   </style>
 </head>
 <body>
@@ -671,8 +861,8 @@
   <div id="loginPage" class="login-page">
     <div class="login-card">
       <div class="login-brand">
-        <div class="bank-icon">&#x1F3E6;</div>
-        <h1>BOA</h1>
+        <div class="bank-icon">R</div>
+        <h1>Revolut</h1>
         <p>Secure Online Banking</p>
       </div>
 
@@ -696,14 +886,14 @@
     <!-- Top bar -->
     <div class="topbar">
       <div class="topbar-brand">
-        <div class="icon">&#x1F3E6;</div>
-        <span>BOA</span>
+        <div class="icon">R</div>
+        <span>Revolut</span>
       </div>
       <div class="topbar-actions">
         <button onclick="toggleTheme()" title="Toggle theme">&#x1F313;</button>
         <div class="user-pill">
           <div class="user-avatar">MS</div>
-          <span>Maggie</span>
+          <span>Margaret</span>
         </div>
       </div>
     </div>
@@ -714,27 +904,31 @@
       <!-- Desktop nav pills -->
       <div class="nav-pills">
         <button class="active" onclick="showSection(0)" id="tab0">Overview</button>
-        <button onclick="showSection(1)" id="tab1">Transfer</button>
+        <button onclick="showSection(1)" id="tab1">Payments</button>
         <button onclick="showSection(2)" id="tab2">Transactions</button>
         <button onclick="showSection(3)" id="tab3">Cards</button>
-        <button onclick="showSection(4)" id="tab4">Account</button>
+        <button onclick="showSection(4)" id="tab4">Profile</button>
       </div>
 
       <!-- SECTION: Overview -->
       <div id="section0" class="section active">
         <div class="balance-hero">
           <div class="balance-label">Available Balance</div>
-          <div class="balance-amount" id="heroBalance">$99,000.00</div>
-          <div class="balance-sub">Personal Checking &bull; USD</div>
+          <div class="balance-amount" id="heroBalance">&pound;100,000.00</div>
+          <div class="balance-sub">Personal Current Account &bull; GBP</div>
+          <div class="balance-actions">
+            <button onclick="showSection(1);showPaymentTab('send')">Send</button>
+            <button onclick="showSection(1);showPaymentTab('receive')">Receive</button>
+          </div>
         </div>
 
         <div class="stats-row">
           <div class="stat-card">
-            <div class="stat-value" id="statDeposits">$100,000.00</div>
+            <div class="stat-value" id="statDeposits">&pound;100,000.00</div>
             <div class="stat-label">Total Deposits</div>
           </div>
           <div class="stat-card">
-            <div class="stat-value" id="statTransfers">$0.00</div>
+            <div class="stat-value" id="statTransfers">&pound;0.00</div>
             <div class="stat-label">Total Transfers</div>
           </div>
           <div class="stat-card">
@@ -754,36 +948,105 @@
         </div>
       </div>
 
-      <!-- SECTION: Transfer -->
+      <!-- SECTION: Payments (Transfer + Receive) -->
       <div id="section1" class="section">
-        <div class="card">
-          <div class="card-header">
-            <span class="card-title">Send Money</span>
-          </div>
-          <p style="color:var(--text-secondary);font-size:14px;margin-bottom:20px;">Transfer funds to approved recipients.</p>
+        <div class="tab-pair">
+          <button class="active" id="payTabSend" onclick="showPaymentTab('send')">Send Money</button>
+          <button id="payTabReceive" onclick="showPaymentTab('receive')">Receive Payment</button>
+        </div>
 
-          <div class="recipient-grid">
-            <div class="recipient-option" onclick="selectRecipient(this, 'Sophie Williams')">
-              <div class="recipient-name">Sophie Williams</div>
-              <div class="recipient-info">Acct ****0027</div>
+        <!-- Send sub-section -->
+        <div id="paySend" class="sub-section active">
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Transfer Funds</span>
             </div>
-            <div class="recipient-option" onclick="selectRecipient(this, 'Daniel Harris')">
-              <div class="recipient-name">Daniel Harris</div>
-              <div class="recipient-info">Acct ****0035</div>
+            <p style="color:var(--text-secondary);font-size:14px;margin-bottom:20px;">Send GBP to a recipient via bank transfer.</p>
+
+            <div class="form-field">
+              <label>Recipient Name</label>
+              <input type="text" id="transferRecipient" placeholder="Full name of recipient">
+            </div>
+            <div class="form-field">
+              <label>Recipient IBAN / Account Number</label>
+              <input type="text" id="transferIban" placeholder="e.g. GB29 NWBK 6016 1331 9268 19">
+            </div>
+            <div class="form-field">
+              <label>Amount (GBP)</label>
+              <input type="number" id="transferAmt" placeholder="0.00" min="0.01" step="0.01">
+            </div>
+            <div class="form-field">
+              <label>Reference</label>
+              <input type="text" id="transferRef" placeholder="e.g. Invoice payment" maxlength="100">
+            </div>
+
+            <button class="btn btn-primary" id="transferBtn" onclick="doTransfer()">Send Transfer</button>
+            <div id="transferMsg" class="transfer-msg"></div>
+          </div>
+        </div>
+
+        <!-- Receive sub-section -->
+        <div id="payReceive" class="sub-section">
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Receive Payment</span>
+            </div>
+            <p style="color:var(--text-secondary);font-size:14px;margin-bottom:20px;">Share these details with the sender to receive GBP payments into your account.</p>
+
+            <div class="receive-info">
+              <h4>Your Bank Details</h4>
+              <div class="receive-detail">
+                <span class="label">Beneficiary</span>
+                <span class="value">Margaret Stannard</span>
+              </div>
+              <div class="receive-detail">
+                <span class="label">IBAN</span>
+                <span class="value">GB76 REVO 0099 7048 7060 94</span>
+              </div>
+              <div class="receive-detail">
+                <span class="label">BIC / SWIFT</span>
+                <span class="value">REVOGB21</span>
+              </div>
+              <div class="receive-detail">
+                <span class="label">Correspondent BIC</span>
+                <span class="value">CHASGB2L</span>
+              </div>
+              <div class="receive-detail">
+                <span class="label">Currency</span>
+                <span class="value">GBP - British Pound</span>
+              </div>
+              <div class="receive-detail">
+                <span class="label">Bank</span>
+                <span class="value">Revolut Ltd</span>
+              </div>
+              <div class="receive-detail">
+                <span class="label">Address</span>
+                <span class="value">30 South Colonnade, E14 5HX, London, UK</span>
+              </div>
+            </div>
+            <button class="copy-btn" onclick="copyBankDetails()">Copy Bank Details</button>
+
+            <div style="margin-top:24px;">
+              <div class="card-header">
+                <span class="card-title">Log Incoming Payment</span>
+              </div>
+              <p style="color:var(--text-secondary);font-size:14px;margin-bottom:16px;">Record a received payment to your account.</p>
+              <div class="form-field">
+                <label>Sender Name</label>
+                <input type="text" id="receiveSender" placeholder="Full name of sender">
+              </div>
+              <div class="form-field">
+                <label>Amount (GBP)</label>
+                <input type="number" id="receiveAmt" placeholder="0.00" min="0.01" step="0.01">
+              </div>
+              <div class="form-field">
+                <label>Reference</label>
+                <input type="text" id="receiveRef" placeholder="e.g. Payment for services" maxlength="100">
+              </div>
+              <button class="btn btn-success" id="receiveBtn" onclick="doReceive()">Confirm Payment Received</button>
+              <div id="receiveMsg" class="transfer-msg"></div>
             </div>
           </div>
-
-          <div class="form-field">
-            <label>Amount (USD)</label>
-            <input type="number" id="transferAmt" placeholder="0.00" min="0.01" step="0.01">
-          </div>
-          <div class="form-field">
-            <label>Reference / Memo</label>
-            <input type="text" id="transferRef" placeholder="e.g. Rent payment" maxlength="100">
-          </div>
-
-          <button class="btn btn-primary" id="transferBtn" onclick="doTransfer()">Send Transfer</button>
-          <div id="transferMsg" class="transfer-msg"></div>
         </div>
       </div>
 
@@ -808,12 +1071,12 @@
           <div class="virtual-card">
             <div>
               <div class="card-chip"></div>
-              <div class="card-number">&bull;&bull;&bull;&bull;  &bull;&bull;&bull;&bull;  &bull;&bull;&bull;&bull;  6284</div>
+              <div class="card-number">&bull;&bull;&bull;&bull;  &bull;&bull;&bull;&bull;  &bull;&bull;&bull;&bull;  7060</div>
             </div>
             <div class="card-bottom">
               <div>
                 <div class="card-holder-label">Card Holder</div>
-                <div class="card-holder-name">MAGGIE STANNARD</div>
+                <div class="card-holder-name">MARGARET STANNARD</div>
               </div>
               <div>
                 <div class="card-holder-label">Expires</div>
@@ -822,43 +1085,87 @@
               <div class="card-network">VISA</div>
             </div>
           </div>
-          <p style="color:var(--text-secondary);font-size:13px;text-align:center;margin-top:16px;">Virtual Debit Card</p>
+          <p style="color:var(--text-secondary);font-size:13px;text-align:center;margin-top:16px;">Virtual Debit Card &bull; Contactless Enabled</p>
         </div>
       </div>
 
-      <!-- SECTION: Account -->
+      <!-- SECTION: Profile -->
       <div id="section4" class="section">
         <div class="card">
+          <div class="profile-header">
+            <div class="profile-avatar">MS</div>
+            <div class="profile-name">Margaret Stannard</div>
+            <div class="profile-subtitle">Personal Account</div>
+          </div>
+        </div>
+
+        <div class="card">
           <div class="card-header">
-            <span class="card-title">Account Information</span>
+            <span class="card-title">Personal Information</span>
           </div>
           <div class="detail-row">
-            <span class="detail-label">Account Holder</span>
-            <span class="detail-value">Maggie Stannard</span>
-          </div>
-          <div class="detail-row">
-            <span class="detail-label">Account Number</span>
-            <span class="detail-value">****6284</span>
-          </div>
-          <div class="detail-row">
-            <span class="detail-label">Routing Number</span>
-            <span class="detail-value">****0173</span>
+            <span class="detail-label">Full Name</span>
+            <span class="detail-value">Margaret Stannard</span>
           </div>
           <div class="detail-row">
             <span class="detail-label">Account Type</span>
-            <span class="detail-value">Personal Checking</span>
+            <span class="detail-value">Personal Current Account</span>
           </div>
           <div class="detail-row">
             <span class="detail-label">Currency</span>
-            <span class="detail-value">USD</span>
+            <span class="detail-value">GBP - British Pound</span>
           </div>
           <div class="detail-row">
             <span class="detail-label">Current Balance</span>
-            <span class="detail-value" id="acctBalance">$99,000.00</span>
+            <span class="detail-value" id="acctBalance">&pound;100,000.00</span>
           </div>
           <div class="detail-row">
             <span class="detail-label">Date Opened</span>
-            <span class="detail-value">March 30, 2026</span>
+            <span class="detail-value">30 March 2026</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Bank Details</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Beneficiary</span>
+            <span class="detail-value">Margaret Stannard</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">IBAN</span>
+            <span class="detail-value">GB76 REVO 0099 7048 7060 94</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">BIC / SWIFT Code</span>
+            <span class="detail-value">REVOGB21</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Correspondent BIC</span>
+            <span class="detail-value">CHASGB2L</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Sort Code</span>
+            <span class="detail-value">00-99-70</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Account Number</span>
+            <span class="detail-value">48706094</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Bank Address</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Bank</span>
+            <span class="detail-value">Revolut Ltd</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Address</span>
+            <span class="detail-value">30 South Colonnade, E14 5HX, London, United Kingdom</span>
           </div>
         </div>
 
@@ -872,7 +1179,7 @@
         <span class="nav-icon">&#x1F3E0;</span><span>Overview</span>
       </a>
       <a href="#" onclick="showSection(1);return false" id="bnav1">
-        <span class="nav-icon">&#x2197;&#xFE0F;</span><span>Transfer</span>
+        <span class="nav-icon">&#x1F4B8;</span><span>Payments</span>
       </a>
       <a href="#" onclick="showSection(2);return false" id="bnav2">
         <span class="nav-icon">&#x1F4CB;</span><span>Activity</span>
@@ -881,7 +1188,7 @@
         <span class="nav-icon">&#x1F4B3;</span><span>Cards</span>
       </a>
       <a href="#" onclick="showSection(4);return false" id="bnav4">
-        <span class="nav-icon">&#x1F464;</span><span>Account</span>
+        <span class="nav-icon">&#x1F464;</span><span>Profile</span>
       </a>
     </div>
   </div>
@@ -944,13 +1251,20 @@
       document.querySelectorAll('.bottom-nav a').forEach((a, i) => a.classList.toggle('active', i === n));
     }
 
+    function showPaymentTab(tab) {
+      document.getElementById('payTabSend').classList.toggle('active', tab === 'send');
+      document.getElementById('payTabReceive').classList.toggle('active', tab === 'receive');
+      document.getElementById('paySend').classList.toggle('active', tab === 'send');
+      document.getElementById('payReceive').classList.toggle('active', tab === 'receive');
+    }
+
     // ---- DATA ----
     function fmt(n) {
-      return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Math.abs(n));
+      return new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' }).format(Math.abs(n));
     }
 
     function fmtDate(d) {
-      return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      return new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
     }
 
     function renderTxns(list, txns, limit) {
@@ -964,12 +1278,11 @@
         const isFee = t.category === 'fee' || t.type === 'fee';
         const iconClass = isFee ? 'fee' : (isDeposit ? 'deposit' : 'transfer');
         const icon = isFee ? '&#x1F4B3;' : (isDeposit ? '&#x2B06;' : '&#x2198;');
-        const badge = t.paymentMethod ? `<span class="txn-badge">${esc(t.paymentMethod)}</span>` : '';
         return `<li class="txn-item">
           <div class="txn-icon ${iconClass}">${icon}</div>
           <div class="txn-details">
-            <div class="txn-desc">${esc(t.description)}${badge}</div>
-            <div class="txn-meta">${fmtDate(t.date)}${t.from ? ' &bull; From ' + esc(t.from) : ''}${t.reference ? ' &bull; ' + esc(t.reference) : ''}</div>
+            <div class="txn-desc">${esc(t.description)}</div>
+            <div class="txn-meta">${fmtDate(t.date)}${t.from ? ' &bull; From ' + esc(t.from) : ''}${t.to ? ' &bull; To ' + esc(t.to) : ''}${t.reference ? ' &bull; ' + esc(t.reference) : ''}</div>
           </div>
           <div class="txn-amount ${isDeposit ? 'positive' : 'negative'}">${isDeposit ? '+' : '-'}${fmt(t.amount)}</div>
         </li>`;
@@ -989,19 +1302,16 @@
           fetch('/api/account?action=transactions').then(r => r.json()),
         ]);
 
-        // Update balance everywhere
         const bal = fmt(acct.balance);
         document.getElementById('heroBalance').textContent = bal;
         document.getElementById('acctBalance').textContent = bal;
 
-        // Stats
         const deposits = txns.filter(t => t.amount > 0).reduce((s, t) => s + t.amount, 0);
         const transfers = txns.filter(t => t.amount < 0).reduce((s, t) => s + Math.abs(t.amount), 0);
         document.getElementById('statDeposits').textContent = fmt(deposits);
         document.getElementById('statTransfers').textContent = fmt(transfers);
         document.getElementById('statTxnCount').textContent = txns.length;
 
-        // Transaction lists
         renderTxns(document.getElementById('recentTxns'), txns, 5);
         renderTxns(document.getElementById('allTxns'), txns);
       } catch (e) {
@@ -1010,23 +1320,19 @@
     }
 
     // ---- TRANSFER ----
-    function selectRecipient(el, name) {
-      document.querySelectorAll('.recipient-option').forEach(r => r.classList.remove('selected'));
-      el.classList.add('selected');
-      selectedRecipient = name;
-    }
-
     async function doTransfer() {
       const msg = document.getElementById('transferMsg');
+      const recipient = document.getElementById('transferRecipient').value.trim();
+      const iban = document.getElementById('transferIban').value.trim();
       const amt = parseFloat(document.getElementById('transferAmt').value);
       const ref = document.getElementById('transferRef').value.trim();
 
       msg.className = 'transfer-msg';
       msg.textContent = '';
 
-      if (!selectedRecipient) {
+      if (!recipient) {
         msg.className = 'transfer-msg error';
-        msg.textContent = 'Please select a recipient.';
+        msg.textContent = 'Please enter a recipient name.';
         return;
       }
       if (!amt || amt <= 0) {
@@ -1043,7 +1349,7 @@
         const res = await fetch('/api/account?action=transfer', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ recipient: selectedRecipient, amount: amt, reference: ref }),
+          body: JSON.stringify({ recipient, amount: amt, reference: ref, recipientIban: iban }),
         });
         const data = await res.json();
         if (data.error) {
@@ -1051,11 +1357,11 @@
           msg.textContent = data.error;
         } else {
           msg.className = 'transfer-msg success';
-          msg.textContent = `Transfer of ${fmt(amt)} to ${selectedRecipient} completed successfully.`;
+          msg.textContent = `Transfer of ${fmt(amt)} to ${recipient} completed successfully.`;
+          document.getElementById('transferRecipient').value = '';
+          document.getElementById('transferIban').value = '';
           document.getElementById('transferAmt').value = '';
           document.getElementById('transferRef').value = '';
-          document.querySelectorAll('.recipient-option').forEach(r => r.classList.remove('selected'));
-          selectedRecipient = null;
           loadData();
         }
       } catch (e) {
@@ -1065,6 +1371,74 @@
 
       btn.disabled = false;
       btn.textContent = 'Send Transfer';
+    }
+
+    // ---- RECEIVE ----
+    async function doReceive() {
+      const msg = document.getElementById('receiveMsg');
+      const sender = document.getElementById('receiveSender').value.trim();
+      const amt = parseFloat(document.getElementById('receiveAmt').value);
+      const ref = document.getElementById('receiveRef').value.trim();
+
+      msg.className = 'transfer-msg';
+      msg.textContent = '';
+
+      if (!sender) {
+        msg.className = 'transfer-msg error';
+        msg.textContent = 'Please enter the sender name.';
+        return;
+      }
+      if (!amt || amt <= 0) {
+        msg.className = 'transfer-msg error';
+        msg.textContent = 'Enter a valid amount.';
+        return;
+      }
+
+      const btn = document.getElementById('receiveBtn');
+      btn.disabled = true;
+      btn.textContent = 'Processing...';
+
+      try {
+        const res = await fetch('/api/account?action=receive', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sender, amount: amt, reference: ref }),
+        });
+        const data = await res.json();
+        if (data.error) {
+          msg.className = 'transfer-msg error';
+          msg.textContent = data.error;
+        } else {
+          msg.className = 'transfer-msg success';
+          msg.textContent = `Payment of ${fmt(amt)} from ${sender} received successfully.`;
+          document.getElementById('receiveSender').value = '';
+          document.getElementById('receiveAmt').value = '';
+          document.getElementById('receiveRef').value = '';
+          loadData();
+        }
+      } catch (e) {
+        msg.className = 'transfer-msg error';
+        msg.textContent = 'Failed to record payment. Please try again.';
+      }
+
+      btn.disabled = false;
+      btn.textContent = 'Confirm Payment Received';
+    }
+
+    // ---- COPY BANK DETAILS ----
+    function copyBankDetails() {
+      const details = `Beneficiary: Margaret Stannard
+IBAN: GB76 REVO 0099 7048 7060 94
+BIC / SWIFT: REVOGB21
+Correspondent BIC: CHASGB2L
+Bank: Revolut Ltd
+Address: 30 South Colonnade, E14 5HX, London, United Kingdom`;
+
+      navigator.clipboard.writeText(details).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => { btn.textContent = 'Copy Bank Details'; }, 2000);
+      }).catch(() => {});
     }
   </script>
 </body>
