@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BOA - Admin Dashboard</title>
+  <title>Revolut - Admin Dashboard</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
@@ -461,7 +461,7 @@
     <div class="admin-login-card">
       <div class="admin-login-brand">
         <div class="shield-icon">&#x1F6E1;</div>
-        <h1>BOA Admin Console</h1>
+        <h1>Revolut Admin Console</h1>
         <p>Encrypted Administrative Dashboard</p>
         <div class="encrypted-badge">&#x1F512; AES-256 Encrypted</div>
       </div>
@@ -482,7 +482,7 @@
     <div class="admin-topbar">
       <div class="admin-topbar-brand">
         <div class="shield">&#x1F6E1;</div>
-        <span>BOA Admin</span>
+        <span>Revolut Admin</span>
         <span class="badge">Encrypted</span>
       </div>
       <div class="admin-topbar-actions">
@@ -621,11 +621,11 @@
     }
 
     function fmt(n) {
-      return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(Math.abs(n));
+      return new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(Math.abs(n));
     }
 
     function fmtDate(d) {
-      return new Date(d).toLocaleString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit" });
+      return new Date(d).toLocaleString("en-GB", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
     }
 
     function esc(s) {
@@ -702,11 +702,16 @@
       const a = cachedAccount;
       const fields = [
         ["Account Holder", a.holder],
+        ["IBAN", a.iban],
+        ["BIC / SWIFT", a.bic],
+        ["Correspondent BIC", a.correspondentBic],
+        ["Sort Code", a.sortCode],
         ["Account Number", a.accountNumber],
-        ["Routing Number", a.routingNumber],
         ["Account Type", a.type],
         ["Currency", a.currency],
         ["Balance", fmt(a.balance || 0)],
+        ["Bank", a.bank],
+        ["Address", a.address],
         ["Date Opened", a.opened],
       ];
       let html = '<div class="data-table-header" style="grid-template-columns:200px 1fr;display:grid;"><span>Field</span><span>Value</span></div>';
