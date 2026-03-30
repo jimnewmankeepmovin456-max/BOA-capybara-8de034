@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BOA - Admin Dashboard</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+    :root {
+      --primary: #0f172a;
+      --primary-light: #1e293b;
+      --accent: #6366f1;
+      --accent-light: #818cf8;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --text: #e2e8f0;
+      --text-secondary: #94a3b8;
+      --bg: #0f172a;
+      --surface: #1e293b;
+      --surface-alt: #334155;
+      --border: #334155;
+      --shadow: 0 4px 20px rgba(0,0,0,0.3);
+      --radius: 12px;
+      --mono: 'JetBrains Mono', monospace;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    /* Login */
+    .admin-login {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(145deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%);
+      padding: 20px;
+    }
+
+    .admin-login-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 48px 40px;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.5);
+    }
+
+    .admin-login-brand {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+
+    .admin-login-brand .shield-icon {
+      width: 64px;
+      height: 64px;
+      background: linear-gradient(135deg, #6366f1, #818cf8);
+      border-radius: 16px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      margin-bottom: 16px;
+    }
+
+    .admin-login-brand h1 {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .admin-login-brand p {
+      color: var(--text-secondary);
+      font-size: 14px;
+      margin-top: 4px;
+    }
+
+    .encrypted-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(99, 102, 241, 0.15);
+      color: var(--accent-light);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-top: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .form-field {
+      margin-bottom: 20px;
+    }
+
+    .form-field label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+
+    .form-field input {
+      width: 100%;
+      padding: 14px 16px;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      font-size: 15px;
+      font-family: var(--mono);
+      background: var(--bg);
+      color: var(--text);
+      transition: border-color 0.2s;
+    }
+
+    .form-field input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 14px 24px;
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.2s;
+      width: 100%;
+    }
+
+    .btn-admin {
+      background: linear-gradient(135deg, #6366f1, #818cf8);
+      color: white;
+    }
+
+    .btn-admin:hover { opacity: 0.9; }
+
+    .login-error {
+      color: var(--danger);
+      text-align: center;
+      font-size: 14px;
+      margin-top: 12px;
+      min-height: 20px;
+    }
+
+    /* Dashboard */
+    .admin-app { display: none; min-height: 100vh; }
+    .admin-app.active { display: flex; flex-direction: column; }
+
+    /* Top bar */
+    .admin-topbar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .admin-topbar-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .admin-topbar-brand .shield {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, #6366f1, #818cf8);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+
+    .admin-topbar-brand span {
+      font-weight: 700;
+      font-size: 16px;
+    }
+
+    .admin-topbar-brand .badge {
+      background: rgba(99, 102, 241, 0.2);
+      color: var(--accent-light);
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .admin-topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .admin-topbar-actions button {
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      font-family: inherit;
+    }
+
+    .admin-topbar-actions button:hover { background: var(--border); }
+
+    .enc-status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--success);
+      font-weight: 600;
+    }
+
+    .enc-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--success);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    /* Content */
+    .admin-content {
+      flex: 1;
+      max-width: 1100px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 24px 20px 40px;
+    }
+
+    /* Summary cards */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .summary-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+    }
+
+    .summary-card .label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+
+    .summary-card .value {
+      font-size: 24px;
+      font-weight: 700;
+    }
+
+    .summary-card .sub {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+
+    /* Tabs */
+    .admin-tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0;
+    }
+
+    .admin-tabs button {
+      background: none;
+      border: none;
+      padding: 12px 20px;
+      font-size: 14px;
+      font-weight: 500;
+      font-family: inherit;
+      color: var(--text-secondary);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .admin-tabs button.active {
+      color: var(--accent-light);
+      border-bottom-color: var(--accent);
+    }
+
+    .admin-tabs button:hover:not(.active) {
+      color: var(--text);
+    }
+
+    /* Panel */
+    .admin-panel { display: none; }
+    .admin-panel.active { display: block; animation: fadeIn 0.3s ease; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Table */
+    .data-table {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .data-table-header {
+      display: grid;
+      padding: 14px 20px;
+      background: var(--surface-alt);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-secondary);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .data-table-row {
+      display: grid;
+      padding: 14px 20px;
+      font-size: 13px;
+      border-bottom: 1px solid var(--border);
+      transition: background 0.15s;
+    }
+
+    .data-table-row:last-child { border-bottom: none; }
+    .data-table-row:hover { background: rgba(99, 102, 241, 0.04); }
+
+    .act-grid {
+      grid-template-columns: 140px 120px 1fr 1fr;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .txn-grid {
+      grid-template-columns: 140px 1fr 120px 100px;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .tag-deposit { background: rgba(16,185,129,0.15); color: #34d399; }
+    .tag-transfer { background: rgba(59,130,246,0.15); color: #60a5fa; }
+    .tag-fee { background: rgba(245,158,11,0.15); color: #fbbf24; }
+    .tag-login { background: rgba(99,102,241,0.15); color: #a5b4fc; }
+    .tag-account { background: rgba(139,92,246,0.15); color: #c084fc; }
+
+    .encrypted-text {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--accent-light);
+      background: rgba(99, 102, 241, 0.08);
+      padding: 2px 8px;
+      border-radius: 4px;
+      word-break: break-all;
+    }
+
+    .amount-positive { color: var(--success); font-weight: 600; }
+    .amount-negative { color: var(--danger); font-weight: 600; }
+
+    .toggle-enc {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--accent-light);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      width: auto;
+      margin-left: 8px;
+    }
+
+    .toggle-enc:hover { background: rgba(99,102,241,0.1); }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-secondary);
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-secondary);
+    }
+
+    @media (max-width: 768px) {
+      .summary-grid { grid-template-columns: repeat(2, 1fr); }
+      .act-grid { grid-template-columns: 100px 90px 1fr; }
+      .act-grid > :nth-child(4) { display: none; }
+      .txn-grid { grid-template-columns: 100px 1fr 100px; }
+      .txn-grid > :nth-child(4) { display: none; }
+      .admin-login-card { padding: 36px 24px; }
+    }
+
+    @media (max-width: 480px) {
+      .summary-grid { grid-template-columns: 1fr; }
+      .admin-content { padding: 16px 12px 40px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Admin Login -->
+  <div id="adminLogin" class="admin-login">
+    <div class="admin-login-card">
+      <div class="admin-login-brand">
+        <div class="shield-icon">&#x1F6E1;</div>
+        <h1>BOA Admin Console</h1>
+        <p>Encrypted Administrative Dashboard</p>
+        <div class="encrypted-badge">&#x1F512; AES-256 Encrypted</div>
+      </div>
+
+      <div class="form-field">
+        <label>Admin Password</label>
+        <input type="password" id="adminPass" placeholder="Enter admin password" autocomplete="off">
+      </div>
+
+      <button class="btn btn-admin" onclick="adminLogin()">&#x1F512; Authenticate</button>
+      <div id="adminError" class="login-error"></div>
+    </div>
+  </div>
+
+  <!-- Admin Dashboard -->
+  <div id="adminApp" class="admin-app">
+
+    <div class="admin-topbar">
+      <div class="admin-topbar-brand">
+        <div class="shield">&#x1F6E1;</div>
+        <span>BOA Admin</span>
+        <span class="badge">Encrypted</span>
+      </div>
+      <div class="admin-topbar-actions">
+        <div class="enc-status">
+          <div class="enc-dot"></div>
+          <span>Encryption Active</span>
+        </div>
+        <button onclick="refreshData()">&#x1F504; Refresh</button>
+        <button onclick="adminLogout()">Sign Out</button>
+      </div>
+    </div>
+
+    <div class="admin-content">
+
+      <!-- Summary -->
+      <div class="summary-grid">
+        <div class="summary-card">
+          <div class="label">Account Balance</div>
+          <div class="value" id="sumBalance">--</div>
+          <div class="sub">Current balance</div>
+        </div>
+        <div class="summary-card">
+          <div class="label">Transactions</div>
+          <div class="value" id="sumTxns">--</div>
+          <div class="sub">Total count</div>
+        </div>
+        <div class="summary-card">
+          <div class="label">Activities</div>
+          <div class="value" id="sumActs">--</div>
+          <div class="sub">Logged events</div>
+        </div>
+        <div class="summary-card">
+          <div class="label">Last Activity</div>
+          <div class="value" style="font-size:14px;" id="sumLast">--</div>
+          <div class="sub" id="sumLastTime">--</div>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="admin-tabs">
+        <button class="active" onclick="showAdminPanel(0)" id="atab0">Activities</button>
+        <button onclick="showAdminPanel(1)" id="atab1">Transactions</button>
+        <button onclick="showAdminPanel(2)" id="atab2">Account Details</button>
+      </div>
+
+      <!-- Activities panel -->
+      <div id="apanel0" class="admin-panel active">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+          <h3 style="font-size:16px;">Activity Log</h3>
+          <button class="toggle-enc" onclick="toggleEncryption()">&#x1F50D; Toggle Encrypted View</button>
+        </div>
+        <div class="data-table" id="activitiesTable">
+          <div class="loading">Loading activities...</div>
+        </div>
+      </div>
+
+      <!-- Transactions panel -->
+      <div id="apanel1" class="admin-panel">
+        <h3 style="font-size:16px;margin-bottom:16px;">Transaction Records</h3>
+        <div class="data-table" id="transactionsTable">
+          <div class="loading">Loading transactions...</div>
+        </div>
+      </div>
+
+      <!-- Account panel -->
+      <div id="apanel2" class="admin-panel">
+        <h3 style="font-size:16px;margin-bottom:16px;">Account Information</h3>
+        <div class="data-table" id="accountTable">
+          <div class="loading">Loading account...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let adminToken = null;
+    let showEncrypted = true;
+    let cachedActivities = [];
+    let cachedTransactions = [];
+    let cachedAccount = {};
+
+    function encryptText(text) {
+      return text.split("").map(c => String.fromCharCode(c.charCodeAt(0) + 3)).join("");
+    }
+
+    // Admin login
+    async function adminLogin() {
+      const pass = document.getElementById("adminPass").value;
+      const err = document.getElementById("adminError");
+      err.textContent = "";
+
+      try {
+        const res = await fetch("/api/admin?action=login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ password: pass }),
+        });
+        const data = await res.json();
+        if (data.success) {
+          adminToken = data.token;
+          document.getElementById("adminLogin").style.display = "none";
+          document.getElementById("adminApp").classList.add("active");
+          loadAdminData();
+        } else {
+          err.textContent = data.error || "Authentication failed.";
+        }
+      } catch (e) {
+        err.textContent = "Connection error. Please try again.";
+      }
+    }
+
+    function adminLogout() {
+      adminToken = null;
+      document.getElementById("adminApp").classList.remove("active");
+      document.getElementById("adminLogin").style.display = "";
+      document.getElementById("adminPass").value = "";
+    }
+
+    document.addEventListener("keypress", e => {
+      if (e.key === "Enter" && document.getElementById("adminLogin").style.display !== "none") adminLogin();
+    });
+
+    // Panels
+    function showAdminPanel(n) {
+      document.querySelectorAll(".admin-panel").forEach(p => p.classList.remove("active"));
+      document.getElementById(`apanel${n}`).classList.add("active");
+      document.querySelectorAll(".admin-tabs button").forEach((b, i) => b.classList.toggle("active", i === n));
+    }
+
+    // Data loading
+    async function adminFetch(action) {
+      const res = await fetch(`/api/admin?action=${action}`, {
+        headers: { "x-admin-token": adminToken },
+      });
+      return res.json();
+    }
+
+    function fmt(n) {
+      return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(Math.abs(n));
+    }
+
+    function fmtDate(d) {
+      return new Date(d).toLocaleString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit" });
+    }
+
+    function esc(s) {
+      const d = document.createElement("div");
+      d.textContent = s;
+      return d.innerHTML;
+    }
+
+    function getActionTag(action) {
+      const map = {
+        deposit: "tag-deposit",
+        transfer: "tag-transfer",
+        fee_charged: "tag-fee",
+        login: "tag-login",
+        account_created: "tag-account",
+      };
+      return map[action] || "tag-login";
+    }
+
+    function getTypeTag(type) {
+      const map = {
+        deposit: "tag-deposit",
+        transfer: "tag-transfer",
+        fee: "tag-fee",
+      };
+      return map[type] || "tag-transfer";
+    }
+
+    function toggleEncryption() {
+      showEncrypted = !showEncrypted;
+      renderActivities();
+    }
+
+    function renderActivities() {
+      const container = document.getElementById("activitiesTable");
+      if (!cachedActivities.length) {
+        container.innerHTML = '<div class="empty-state">No activities recorded.</div>';
+        return;
+      }
+      let html = '<div class="data-table-header act-grid"><span>Timestamp</span><span>Action</span><span>Detail</span><span>Encrypted</span></div>';
+      html += cachedActivities.map(a => {
+        const detail = showEncrypted ? `<span class="encrypted-text">${esc(a.detail_encrypted || encryptText(a.detail))}</span>` : esc(a.detail);
+        return `<div class="data-table-row act-grid">
+          <span style="font-size:12px;color:var(--text-secondary);">${fmtDate(a.timestamp)}</span>
+          <span><span class="tag ${getActionTag(a.action)}">${esc(a.action)}</span></span>
+          <span>${showEncrypted ? esc(a.detail) : esc(a.detail)}</span>
+          <span>${showEncrypted ? '<span class="encrypted-text">' + esc(a.detail_encrypted || encryptText(a.detail)) + '</span>' : '<span style="color:var(--text-secondary);font-size:12px;">Decrypted</span>'}</span>
+        </div>`;
+      }).join("");
+      container.innerHTML = html;
+    }
+
+    function renderTransactions() {
+      const container = document.getElementById("transactionsTable");
+      if (!cachedTransactions.length) {
+        container.innerHTML = '<div class="empty-state">No transactions.</div>';
+        return;
+      }
+      let html = '<div class="data-table-header txn-grid"><span>Date</span><span>Description</span><span>Amount</span><span>Type</span></div>';
+      html += cachedTransactions.map(t => {
+        const isPositive = t.amount > 0;
+        return `<div class="data-table-row txn-grid">
+          <span style="font-size:12px;color:var(--text-secondary);">${fmtDate(t.date)}</span>
+          <span>${esc(t.description)}${t.paymentMethod ? ' <span class="tag tag-fee">' + esc(t.paymentMethod) + '</span>' : ''}${t.from ? ' <span style="color:var(--text-secondary);font-size:12px;">from ' + esc(t.from) + '</span>' : ''}</span>
+          <span class="${isPositive ? 'amount-positive' : 'amount-negative'}">${isPositive ? '+' : '-'}${fmt(t.amount)}</span>
+          <span><span class="tag ${getTypeTag(t.type)}">${esc(t.type)}</span></span>
+        </div>`;
+      }).join("");
+      container.innerHTML = html;
+    }
+
+    function renderAccount() {
+      const container = document.getElementById("accountTable");
+      const a = cachedAccount;
+      const fields = [
+        ["Account Holder", a.holder],
+        ["Account Number", a.accountNumber],
+        ["Routing Number", a.routingNumber],
+        ["Account Type", a.type],
+        ["Currency", a.currency],
+        ["Balance", fmt(a.balance || 0)],
+        ["Date Opened", a.opened],
+      ];
+      let html = '<div class="data-table-header" style="grid-template-columns:200px 1fr;display:grid;"><span>Field</span><span>Value</span></div>';
+      html += fields.map(([label, value]) => {
+        return `<div class="data-table-row" style="grid-template-columns:200px 1fr;display:grid;">
+          <span style="color:var(--text-secondary);">${esc(label)}</span>
+          <span style="font-weight:600;">${esc(String(value || "--"))}</span>
+        </div>`;
+      }).join("");
+      container.innerHTML = html;
+    }
+
+    async function loadAdminData() {
+      try {
+        const [summary, activities, transactions, account] = await Promise.all([
+          adminFetch("summary"),
+          adminFetch("activities"),
+          adminFetch("transactions"),
+          adminFetch("account"),
+        ]);
+
+        cachedActivities = activities;
+        cachedTransactions = transactions;
+        cachedAccount = account;
+
+        // Update summary
+        document.getElementById("sumBalance").textContent = fmt(summary.account?.balance || 0);
+        document.getElementById("sumTxns").textContent = summary.transactionCount || 0;
+        document.getElementById("sumActs").textContent = summary.activityCount || 0;
+        if (summary.lastActivity) {
+          document.getElementById("sumLast").textContent = summary.lastActivity.action;
+          document.getElementById("sumLastTime").textContent = fmtDate(summary.lastActivity.timestamp);
+        }
+
+        renderActivities();
+        renderTransactions();
+        renderAccount();
+      } catch (e) {
+        console.error("Failed to load admin data", e);
+      }
+    }
+
+    function refreshData() {
+      loadAdminData();
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BOA - Online Banking</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+    :root {
+      --primary: #0c2340;
+      --primary-light: #163a64;
+      --accent: #00875a;
+      --accent-light: #00a86b;
+      --danger: #de350b;
+      --text: #172b4d;
+      --text-secondary: #6b778c;
+      --bg: #f4f5f7;
+      --surface: #ffffff;
+      --border: #dfe1e6;
+      --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+      --shadow-lg: 0 10px 30px rgba(0,0,0,0.1);
+      --radius: 12px;
+    }
+
+    [data-theme="dark"] {
+      --primary: #0c2340;
+      --primary-light: #1a3f6f;
+      --accent: #36b37e;
+      --accent-light: #57d9a3;
+      --text: #e1e4e8;
+      --text-secondary: #8b949e;
+      --bg: #0d1117;
+      --surface: #161b22;
+      --border: #30363d;
+      --shadow: 0 1px 3px rgba(0,0,0,0.3);
+      --shadow-lg: 0 10px 30px rgba(0,0,0,0.4);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    /* ---- LOGIN SCREEN ---- */
+    .login-page {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(145deg, #0c2340 0%, #163a64 50%, #00875a 100%);
+      padding: 20px;
+    }
+
+    .login-card {
+      background: var(--surface);
+      border-radius: 20px;
+      padding: 48px 40px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.3);
+    }
+
+    .login-brand {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+
+    .login-brand .bank-icon {
+      width: 56px;
+      height: 56px;
+      background: linear-gradient(135deg, #0c2340, #00875a);
+      border-radius: 16px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      margin-bottom: 16px;
+    }
+
+    .login-brand h1 {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .login-brand p {
+      color: var(--text-secondary);
+      font-size: 14px;
+      margin-top: 4px;
+    }
+
+    .form-field {
+      margin-bottom: 20px;
+    }
+
+    .form-field label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+
+    .form-field input {
+      width: 100%;
+      padding: 14px 16px;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      font-size: 15px;
+      font-family: inherit;
+      background: var(--bg);
+      color: var(--text);
+      transition: border-color 0.2s;
+    }
+
+    .form-field input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 14px 24px;
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.2s;
+      width: 100%;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+    }
+
+    .btn-primary:hover { background: var(--accent-light); }
+
+    .btn-danger {
+      background: var(--danger);
+      color: white;
+    }
+
+    .btn-danger:hover { opacity: 0.9; }
+
+    .login-error {
+      color: var(--danger);
+      text-align: center;
+      font-size: 14px;
+      margin-top: 12px;
+      min-height: 20px;
+    }
+
+    /* ---- APP SHELL ---- */
+    .app { display: none; }
+    .app.active { display: flex; flex-direction: column; min-height: 100vh; }
+
+    /* Top bar */
+    .topbar {
+      background: var(--primary);
+      color: white;
+      padding: 0 24px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .topbar-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 18px;
+    }
+
+    .topbar-brand .icon {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(0,135,90,0.6));
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .topbar-actions button {
+      background: rgba(255,255,255,0.1);
+      border: none;
+      color: white;
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .topbar-actions button:hover { background: rgba(255,255,255,0.2); }
+
+    .user-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 20px;
+      padding: 4px 14px 4px 4px;
+      font-size: 14px;
+    }
+
+    .user-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    /* Main content */
+    .main-content {
+      flex: 1;
+      max-width: 960px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 24px 20px 100px;
+    }
+
+    /* Navigation tabs */
+    .nav-pills {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 24px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .nav-pills::-webkit-scrollbar { display: none; }
+
+    .nav-pills button {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 10px 20px;
+      border-radius: 30px;
+      font-size: 14px;
+      font-weight: 500;
+      font-family: inherit;
+      color: var(--text-secondary);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+
+    .nav-pills button.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    .nav-pills button:not(.active):hover {
+      border-color: var(--text-secondary);
+    }
+
+    /* Sections */
+    .section { display: none; }
+    .section.active { display: block; animation: fadeIn 0.3s ease; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Cards */
+    .card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      padding: 24px;
+      margin-bottom: 16px;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-secondary);
+    }
+
+    /* Balance hero */
+    .balance-hero {
+      background: linear-gradient(135deg, #0c2340 0%, #163a64 60%, #00875a 100%);
+      border-radius: 16px;
+      padding: 32px 28px;
+      color: white;
+      margin-bottom: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .balance-hero::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -20%;
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, rgba(255,255,255,0.06) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+
+    .balance-label {
+      font-size: 13px;
+      font-weight: 500;
+      opacity: 0.8;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .balance-amount {
+      font-size: 40px;
+      font-weight: 800;
+      margin: 8px 0 4px;
+      letter-spacing: -1px;
+    }
+
+    .balance-sub {
+      font-size: 14px;
+      opacity: 0.7;
+    }
+
+    /* Quick stats */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 16px;
+      text-align: center;
+      box-shadow: var(--shadow);
+    }
+
+    .stat-value {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+
+    /* Transactions */
+    .txn-list { list-style: none; }
+
+    .txn-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .txn-item:last-child { border-bottom: none; }
+
+    .txn-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .txn-icon.deposit { background: #e3fcef; }
+    .txn-icon.transfer { background: #deebff; }
+    .txn-icon.fee { background: #fff3e0; }
+
+    [data-theme="dark"] .txn-icon.deposit { background: #1a3a2a; }
+    [data-theme="dark"] .txn-icon.transfer { background: #1a2a3a; }
+    [data-theme="dark"] .txn-icon.fee { background: #3a2a1a; }
+
+    .txn-badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 1px 6px;
+      border-radius: 4px;
+      background: rgba(245,158,11,0.15);
+      color: #f59e0b;
+      margin-left: 6px;
+      vertical-align: middle;
+    }
+
+    .txn-details { flex: 1; min-width: 0; }
+
+    .txn-desc {
+      font-weight: 600;
+      font-size: 14px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .txn-meta {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    .txn-amount {
+      font-weight: 700;
+      font-size: 15px;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .txn-amount.positive { color: var(--accent); }
+    .txn-amount.negative { color: var(--danger); }
+
+    /* Transfer form */
+    .recipient-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .recipient-option {
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: left;
+    }
+
+    .recipient-option:hover { border-color: var(--text-secondary); }
+    .recipient-option.selected { border-color: var(--accent); background: rgba(0,135,90,0.04); }
+
+    [data-theme="dark"] .recipient-option.selected { background: rgba(54,179,126,0.08); }
+
+    .recipient-name {
+      font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+
+    .recipient-info {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .transfer-msg {
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      margin-top: 16px;
+      display: none;
+    }
+
+    .transfer-msg.success { display: block; background: #e3fcef; color: #006644; }
+    .transfer-msg.error { display: block; background: #ffebe6; color: #bf2600; }
+
+    [data-theme="dark"] .transfer-msg.success { background: #1a3a2a; color: #57d9a3; }
+    [data-theme="dark"] .transfer-msg.error { background: #3a1a1a; color: #ff8f73; }
+
+    /* Virtual card */
+    .virtual-card {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      border-radius: 16px;
+      padding: 28px 24px;
+      color: white;
+      position: relative;
+      overflow: hidden;
+      aspect-ratio: 1.6;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      max-width: 420px;
+    }
+
+    .virtual-card::before {
+      content: '';
+      position: absolute;
+      top: -30%;
+      right: -10%;
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+
+    .card-chip {
+      width: 40px;
+      height: 30px;
+      background: linear-gradient(135deg, #d4af37, #f0d060);
+      border-radius: 6px;
+      margin-bottom: 20px;
+    }
+
+    .card-number {
+      font-size: 20px;
+      letter-spacing: 3px;
+      font-weight: 500;
+      margin-bottom: 20px;
+    }
+
+    .card-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+
+    .card-holder-label {
+      font-size: 10px;
+      opacity: 0.6;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .card-holder-name {
+      font-size: 14px;
+      font-weight: 600;
+      margin-top: 2px;
+    }
+
+    .card-network {
+      font-size: 24px;
+      font-weight: 800;
+      font-style: italic;
+      opacity: 0.9;
+    }
+
+    /* Account details */
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+    }
+
+    .detail-row:last-child { border: none; }
+
+    .detail-label { color: var(--text-secondary); }
+    .detail-value { font-weight: 600; }
+
+    /* Bottom nav (mobile) */
+    .bottom-nav {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 6px 0 calc(6px + env(safe-area-inset-bottom, 0px));
+      z-index: 200;
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+    }
+
+    .bottom-nav a {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+      text-decoration: none;
+      color: var(--text-secondary);
+      font-size: 10px;
+      font-weight: 500;
+      gap: 2px;
+      padding: 6px 0;
+      transition: color 0.2s;
+    }
+
+    .bottom-nav a .nav-icon { font-size: 20px; }
+    .bottom-nav a.active { color: var(--accent); }
+
+    /* Loading */
+    .loading-spinner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+
+    .spinner {
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      margin-right: 10px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      .bottom-nav { display: flex; }
+      .nav-pills { display: none; }
+      .main-content { padding: 16px 16px 90px; }
+      .balance-amount { font-size: 32px; }
+      .stats-row { grid-template-columns: 1fr; }
+      .recipient-grid { grid-template-columns: 1fr; }
+      .login-card { padding: 36px 24px; }
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-secondary);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- LOGIN PAGE -->
+  <div id="loginPage" class="login-page">
+    <div class="login-card">
+      <div class="login-brand">
+        <div class="bank-icon">&#x1F3E6;</div>
+        <h1>BOA</h1>
+        <p>Secure Online Banking</p>
+      </div>
+
+      <div class="form-field">
+        <label>Username</label>
+        <input type="text" id="loginUser" placeholder="Enter username" autocomplete="username">
+      </div>
+      <div class="form-field">
+        <label>Password</label>
+        <input type="password" id="loginPass" placeholder="Enter password" autocomplete="current-password">
+      </div>
+
+      <button class="btn btn-primary" id="loginBtn" onclick="handleLogin()">Sign In</button>
+      <div id="loginError" class="login-error"></div>
+    </div>
+  </div>
+
+  <!-- APP -->
+  <div id="app" class="app">
+
+    <!-- Top bar -->
+    <div class="topbar">
+      <div class="topbar-brand">
+        <div class="icon">&#x1F3E6;</div>
+        <span>BOA</span>
+      </div>
+      <div class="topbar-actions">
+        <button onclick="toggleTheme()" title="Toggle theme">&#x1F313;</button>
+        <div class="user-pill">
+          <div class="user-avatar">MS</div>
+          <span>Maggie</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="main-content">
+
+      <!-- Desktop nav pills -->
+      <div class="nav-pills">
+        <button class="active" onclick="showSection(0)" id="tab0">Overview</button>
+        <button onclick="showSection(1)" id="tab1">Transfer</button>
+        <button onclick="showSection(2)" id="tab2">Transactions</button>
+        <button onclick="showSection(3)" id="tab3">Cards</button>
+        <button onclick="showSection(4)" id="tab4">Account</button>
+      </div>
+
+      <!-- SECTION: Overview -->
+      <div id="section0" class="section active">
+        <div class="balance-hero">
+          <div class="balance-label">Available Balance</div>
+          <div class="balance-amount" id="heroBalance">$99,000.00</div>
+          <div class="balance-sub">Personal Checking &bull; USD</div>
+        </div>
+
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="stat-value" id="statDeposits">$100,000.00</div>
+            <div class="stat-label">Total Deposits</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="statTransfers">$0.00</div>
+            <div class="stat-label">Total Transfers</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="statTxnCount">1</div>
+            <div class="stat-label">Transactions</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Recent Activity</span>
+            <a href="#" onclick="showSection(2);return false" style="font-size:13px;color:var(--accent);text-decoration:none;font-weight:600;">View All</a>
+          </div>
+          <ul class="txn-list" id="recentTxns">
+            <li class="loading-spinner"><div class="spinner"></div> Loading...</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- SECTION: Transfer -->
+      <div id="section1" class="section">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Send Money</span>
+          </div>
+          <p style="color:var(--text-secondary);font-size:14px;margin-bottom:20px;">Transfer funds to approved recipients.</p>
+
+          <div class="recipient-grid">
+            <div class="recipient-option" onclick="selectRecipient(this, 'Sophie Williams')">
+              <div class="recipient-name">Sophie Williams</div>
+              <div class="recipient-info">Acct ****0027</div>
+            </div>
+            <div class="recipient-option" onclick="selectRecipient(this, 'Daniel Harris')">
+              <div class="recipient-name">Daniel Harris</div>
+              <div class="recipient-info">Acct ****0035</div>
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label>Amount (USD)</label>
+            <input type="number" id="transferAmt" placeholder="0.00" min="0.01" step="0.01">
+          </div>
+          <div class="form-field">
+            <label>Reference / Memo</label>
+            <input type="text" id="transferRef" placeholder="e.g. Rent payment" maxlength="100">
+          </div>
+
+          <button class="btn btn-primary" id="transferBtn" onclick="doTransfer()">Send Transfer</button>
+          <div id="transferMsg" class="transfer-msg"></div>
+        </div>
+      </div>
+
+      <!-- SECTION: Transactions -->
+      <div id="section2" class="section">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Transaction History</span>
+          </div>
+          <ul class="txn-list" id="allTxns">
+            <li class="loading-spinner"><div class="spinner"></div> Loading...</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- SECTION: Cards -->
+      <div id="section3" class="section">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Your Cards</span>
+          </div>
+          <div class="virtual-card">
+            <div>
+              <div class="card-chip"></div>
+              <div class="card-number">&bull;&bull;&bull;&bull;  &bull;&bull;&bull;&bull;  &bull;&bull;&bull;&bull;  6284</div>
+            </div>
+            <div class="card-bottom">
+              <div>
+                <div class="card-holder-label">Card Holder</div>
+                <div class="card-holder-name">MAGGIE STANNARD</div>
+              </div>
+              <div>
+                <div class="card-holder-label">Expires</div>
+                <div class="card-holder-name">03/29</div>
+              </div>
+              <div class="card-network">VISA</div>
+            </div>
+          </div>
+          <p style="color:var(--text-secondary);font-size:13px;text-align:center;margin-top:16px;">Virtual Debit Card</p>
+        </div>
+      </div>
+
+      <!-- SECTION: Account -->
+      <div id="section4" class="section">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Account Information</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Account Holder</span>
+            <span class="detail-value">Maggie Stannard</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Account Number</span>
+            <span class="detail-value">****6284</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Routing Number</span>
+            <span class="detail-value">****0173</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Account Type</span>
+            <span class="detail-value">Personal Checking</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Currency</span>
+            <span class="detail-value">USD</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Current Balance</span>
+            <span class="detail-value" id="acctBalance">$99,000.00</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Date Opened</span>
+            <span class="detail-value">March 30, 2026</span>
+          </div>
+        </div>
+
+        <button class="btn btn-danger" onclick="logout()" style="max-width:200px;margin-top:8px;">Sign Out</button>
+      </div>
+    </div>
+
+    <!-- Mobile bottom nav -->
+    <div class="bottom-nav">
+      <a href="#" onclick="showSection(0);return false" class="active" id="bnav0">
+        <span class="nav-icon">&#x1F3E0;</span><span>Overview</span>
+      </a>
+      <a href="#" onclick="showSection(1);return false" id="bnav1">
+        <span class="nav-icon">&#x2197;&#xFE0F;</span><span>Transfer</span>
+      </a>
+      <a href="#" onclick="showSection(2);return false" id="bnav2">
+        <span class="nav-icon">&#x1F4CB;</span><span>Activity</span>
+      </a>
+      <a href="#" onclick="showSection(3);return false" id="bnav3">
+        <span class="nav-icon">&#x1F4B3;</span><span>Cards</span>
+      </a>
+      <a href="#" onclick="showSection(4);return false" id="bnav4">
+        <span class="nav-icon">&#x1F464;</span><span>Account</span>
+      </a>
+    </div>
+  </div>
+
+  <script>
+    const CREDS = { user: "maggiestannard", pass: "cYkn&#Rk6@SZnQ7" };
+    let selectedRecipient = null;
+
+    // ---- THEME ----
+    function setTheme(t) {
+      document.documentElement.setAttribute('data-theme', t);
+      localStorage.setItem('bankTheme', t);
+    }
+    function toggleTheme() {
+      const cur = document.documentElement.getAttribute('data-theme') || 'light';
+      setTheme(cur === 'dark' ? 'light' : 'dark');
+    }
+    (function initTheme() {
+      const s = localStorage.getItem('bankTheme');
+      if (s) setTheme(s);
+      else if (window.matchMedia?.('(prefers-color-scheme: dark)').matches) setTheme('dark');
+    })();
+
+    // ---- AUTH ----
+    function handleLogin() {
+      const u = document.getElementById('loginUser').value.trim();
+      const p = document.getElementById('loginPass').value;
+      const err = document.getElementById('loginError');
+      if (u === CREDS.user && p === CREDS.pass) {
+        document.getElementById('loginPage').style.display = 'none';
+        document.getElementById('app').classList.add('active');
+        fetch('/api/account?action=log', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ activity: 'login', detail: 'User logged in' }),
+        }).catch(() => {});
+        loadData();
+      } else {
+        err.textContent = 'Invalid username or password.';
+      }
+    }
+
+    function logout() {
+      document.getElementById('app').classList.remove('active');
+      document.getElementById('loginPage').style.display = '';
+      document.getElementById('loginUser').value = '';
+      document.getElementById('loginPass').value = '';
+      document.getElementById('loginError').textContent = '';
+    }
+
+    document.addEventListener('keypress', e => {
+      if (e.key === 'Enter' && document.getElementById('loginPage').style.display !== 'none') handleLogin();
+    });
+
+    // ---- NAVIGATION ----
+    function showSection(n) {
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      document.getElementById(`section${n}`).classList.add('active');
+      document.querySelectorAll('.nav-pills button').forEach((b, i) => b.classList.toggle('active', i === n));
+      document.querySelectorAll('.bottom-nav a').forEach((a, i) => a.classList.toggle('active', i === n));
+    }
+
+    // ---- DATA ----
+    function fmt(n) {
+      return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Math.abs(n));
+    }
+
+    function fmtDate(d) {
+      return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+
+    function renderTxns(list, txns, limit) {
+      const items = limit ? txns.slice(0, limit) : txns;
+      if (!items.length) {
+        list.innerHTML = '<li class="empty-state">No transactions yet.</li>';
+        return;
+      }
+      list.innerHTML = items.map(t => {
+        const isDeposit = t.amount > 0;
+        const isFee = t.category === 'fee' || t.type === 'fee';
+        const iconClass = isFee ? 'fee' : (isDeposit ? 'deposit' : 'transfer');
+        const icon = isFee ? '&#x1F4B3;' : (isDeposit ? '&#x2B06;' : '&#x2198;');
+        const badge = t.paymentMethod ? `<span class="txn-badge">${esc(t.paymentMethod)}</span>` : '';
+        return `<li class="txn-item">
+          <div class="txn-icon ${iconClass}">${icon}</div>
+          <div class="txn-details">
+            <div class="txn-desc">${esc(t.description)}${badge}</div>
+            <div class="txn-meta">${fmtDate(t.date)}${t.from ? ' &bull; From ' + esc(t.from) : ''}${t.reference ? ' &bull; ' + esc(t.reference) : ''}</div>
+          </div>
+          <div class="txn-amount ${isDeposit ? 'positive' : 'negative'}">${isDeposit ? '+' : '-'}${fmt(t.amount)}</div>
+        </li>`;
+      }).join('');
+    }
+
+    function esc(s) {
+      const d = document.createElement('div');
+      d.textContent = s;
+      return d.innerHTML;
+    }
+
+    async function loadData() {
+      try {
+        const [acct, txns] = await Promise.all([
+          fetch('/api/account').then(r => r.json()),
+          fetch('/api/account?action=transactions').then(r => r.json()),
+        ]);
+
+        // Update balance everywhere
+        const bal = fmt(acct.balance);
+        document.getElementById('heroBalance').textContent = bal;
+        document.getElementById('acctBalance').textContent = bal;
+
+        // Stats
+        const deposits = txns.filter(t => t.amount > 0).reduce((s, t) => s + t.amount, 0);
+        const transfers = txns.filter(t => t.amount < 0).reduce((s, t) => s + Math.abs(t.amount), 0);
+        document.getElementById('statDeposits').textContent = fmt(deposits);
+        document.getElementById('statTransfers').textContent = fmt(transfers);
+        document.getElementById('statTxnCount').textContent = txns.length;
+
+        // Transaction lists
+        renderTxns(document.getElementById('recentTxns'), txns, 5);
+        renderTxns(document.getElementById('allTxns'), txns);
+      } catch (e) {
+        console.error('Failed to load data', e);
+      }
+    }
+
+    // ---- TRANSFER ----
+    function selectRecipient(el, name) {
+      document.querySelectorAll('.recipient-option').forEach(r => r.classList.remove('selected'));
+      el.classList.add('selected');
+      selectedRecipient = name;
+    }
+
+    async function doTransfer() {
+      const msg = document.getElementById('transferMsg');
+      const amt = parseFloat(document.getElementById('transferAmt').value);
+      const ref = document.getElementById('transferRef').value.trim();
+
+      msg.className = 'transfer-msg';
+      msg.textContent = '';
+
+      if (!selectedRecipient) {
+        msg.className = 'transfer-msg error';
+        msg.textContent = 'Please select a recipient.';
+        return;
+      }
+      if (!amt || amt <= 0) {
+        msg.className = 'transfer-msg error';
+        msg.textContent = 'Enter a valid amount.';
+        return;
+      }
+
+      const btn = document.getElementById('transferBtn');
+      btn.disabled = true;
+      btn.textContent = 'Processing...';
+
+      try {
+        const res = await fetch('/api/account?action=transfer', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ recipient: selectedRecipient, amount: amt, reference: ref }),
+        });
+        const data = await res.json();
+        if (data.error) {
+          msg.className = 'transfer-msg error';
+          msg.textContent = data.error;
+        } else {
+          msg.className = 'transfer-msg success';
+          msg.textContent = `Transfer of ${fmt(amt)} to ${selectedRecipient} completed successfully.`;
+          document.getElementById('transferAmt').value = '';
+          document.getElementById('transferRef').value = '';
+          document.querySelectorAll('.recipient-option').forEach(r => r.classList.remove('selected'));
+          selectedRecipient = null;
+          loadData();
+        }
+      } catch (e) {
+        msg.className = 'transfer-msg error';
+        msg.textContent = 'Transfer failed. Please try again.';
+      }
+
+      btn.disabled = false;
+      btn.textContent = 'Send Transfer';
+    }
+  </script>
+</body>
+</html>
