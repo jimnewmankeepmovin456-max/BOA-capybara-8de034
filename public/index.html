@@ -897,8 +897,8 @@
       <!-- Login Form -->
       <div id="loginForm">
         <div class="form-field">
-          <label>Username</label>
-          <input type="text" id="loginUser" placeholder="Enter username" autocomplete="username">
+          <label>Username or Email</label>
+          <input type="text" id="loginUser" placeholder="Enter username or email" autocomplete="username">
         </div>
         <div class="form-field">
           <label>Password</label>
@@ -1270,21 +1270,47 @@
     })();
 
     // ---- AUTH ----
-    function handleLogin() {
+    function loginSuccess() {
+      document.getElementById('loginPage').style.display = 'none';
+      document.getElementById('app').classList.add('active');
+      fetch('/api/account?action=log', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ activity: 'login', detail: 'User logged in' }),
+      }).catch(() => {});
+      loadData();
+    }
+
+    async function handleLogin() {
       const u = document.getElementById('loginUser').value.trim();
       const p = document.getElementById('loginPass').value;
       const err = document.getElementById('loginError');
+      err.textContent = '';
+
+      if (!u || !p) {
+        err.textContent = 'Please enter your credentials.';
+        return;
+      }
+
+      // Try hardcoded credentials first
       if (u === CREDS.user && p === CREDS.pass) {
-        document.getElementById('loginPage').style.display = 'none';
-        document.getElementById('app').classList.add('active');
-        fetch('/api/account?action=log', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ activity: 'login', detail: 'User logged in' }),
-        }).catch(() => {});
-        loadData();
-      } else {
+        loginSuccess();
+        return;
+      }
+
+      // Try Netlify Identity login (for users who signed up)
+      const btn = document.getElementById('loginBtn');
+      btn.disabled = true;
+      btn.textContent = 'Signing in...';
+      try {
+        const { login } = await import('https://esm.sh/@netlify/identity');
+        await login(u, p);
+        loginSuccess();
+      } catch (error) {
         err.textContent = 'Invalid username or password.';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Sign In';
       }
     }
 
