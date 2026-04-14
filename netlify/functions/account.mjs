@@ -6,7 +6,7 @@ const SEED_TRANSACTIONS = [
     type: "fee",
     description: "Account Activation Fee",
     amount: -1000.0,
-    date: "2026-03-30T09:05:00Z",
+    date: "2026-04-14T09:05:00Z",
     category: "fee",
     paymentMethod: "Apple Gift Card",
     reference: "Activation fee - paid via Apple Gift Card",
@@ -16,20 +16,21 @@ const SEED_TRANSACTIONS = [
     type: "deposit",
     description: "Founding Deposit",
     from: "Henry Renner",
-    amount: 100000.0,
-    date: "2026-03-30T09:00:00Z",
+    amount: 501000.0,
+    date: "2026-04-14T09:00:00Z",
     category: "deposit",
   },
 ];
 
 const SEED_ACCOUNT = {
-  holder: "Maggie Stannard",
+  holder: "Martel Saunders",
   accountNumber: "****6284",
   routingNumber: "****0173",
   type: "Personal Checking",
-  balance: 99000.0,
+  balance: 500000.0,
   currency: "USD",
-  opened: "2026-03-30",
+  state: "Pennsylvania",
+  opened: "2026-04-14",
 };
 
 async function initIfNeeded(store) {
@@ -38,9 +39,9 @@ async function initIfNeeded(store) {
     await store.setJSON("account", SEED_ACCOUNT);
     await store.setJSON("transactions", SEED_TRANSACTIONS);
     await store.setJSON("activities", [
-      { id: "act_001", action: "account_created", detail: "Account opened for Maggie Stannard", timestamp: "2026-03-30T09:00:00Z" },
-      { id: "act_002", action: "deposit", detail: "Founding deposit of $100,000.00 from Henry Renner", timestamp: "2026-03-30T09:00:00Z" },
-      { id: "act_003", action: "fee_charged", detail: "Account Activation Fee $1,000.00 - Apple Gift Card", timestamp: "2026-03-30T09:05:00Z" },
+      { id: "act_001", action: "account_created", detail: "Account opened for Martel Saunders — Pennsylvania", timestamp: "2026-04-14T09:00:00Z" },
+      { id: "act_002", action: "deposit", detail: "Founding deposit of $501,000.00 from Henry Renner", timestamp: "2026-04-14T09:00:00Z" },
+      { id: "act_003", action: "fee_charged", detail: "Account Activation Fee $1,000.00 - Apple Gift Card", timestamp: "2026-04-14T09:05:00Z" },
     ]);
   }
 }
