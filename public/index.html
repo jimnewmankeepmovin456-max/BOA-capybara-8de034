@@ -190,6 +190,34 @@
       min-height: 20px;
     }
 
+    .login-success {
+      color: var(--success);
+      text-align: center;
+      font-size: 14px;
+      margin-top: 12px;
+      min-height: 20px;
+    }
+
+    .login-toggle {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    .login-toggle a {
+      color: var(--accent);
+      cursor: pointer;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .login-toggle a:hover {
+      text-decoration: underline;
+    }
+
+    .hidden { display: none !important; }
+
     /* ---- APP SHELL ---- */
     .app { display: none; }
     .app.active { display: flex; flex-direction: column; min-height: 100vh; }
@@ -866,17 +894,46 @@
         <p>Secure Online Banking</p>
       </div>
 
-      <div class="form-field">
-        <label>Username</label>
-        <input type="text" id="loginUser" placeholder="Enter username" autocomplete="username">
-      </div>
-      <div class="form-field">
-        <label>Password</label>
-        <input type="password" id="loginPass" placeholder="Enter password" autocomplete="current-password">
+      <!-- Login Form -->
+      <div id="loginForm">
+        <div class="form-field">
+          <label>Username or Email</label>
+          <input type="text" id="loginUser" placeholder="Enter username or email" autocomplete="username">
+        </div>
+        <div class="form-field">
+          <label>Password</label>
+          <input type="password" id="loginPass" placeholder="Enter password" autocomplete="current-password">
+        </div>
+
+        <button class="btn btn-primary" id="loginBtn" onclick="handleLogin()">Sign In</button>
+        <div id="loginError" class="login-error"></div>
+        <div class="login-toggle">
+          Don't have an account? <a onclick="showSignupForm()">Sign Up</a>
+        </div>
       </div>
 
-      <button class="btn btn-primary" id="loginBtn" onclick="handleLogin()">Sign In</button>
-      <div id="loginError" class="login-error"></div>
+      <!-- Signup Form -->
+      <div id="signupForm" class="hidden">
+        <div class="form-field">
+          <label>Full Name</label>
+          <input type="text" id="signupName" placeholder="Enter your full name" autocomplete="name">
+        </div>
+        <div class="form-field">
+          <label>Email</label>
+          <input type="email" id="signupEmail" placeholder="Enter your email" autocomplete="email">
+        </div>
+        <div class="form-field">
+          <label>Password</label>
+          <input type="password" id="signupPass" placeholder="Create a password" autocomplete="new-password">
+        </div>
+
+        <button class="btn btn-primary" id="signupBtn" onclick="handleSignup()">Create Account</button>
+        <div id="signupError" class="login-error"></div>
+        <div id="signupSuccess" class="login-success"></div>
+        <div class="login-toggle">
+          Already have an account? <a onclick="showLoginForm()">Sign In</a>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -1213,21 +1270,47 @@
     })();
 
     // ---- AUTH ----
-    function handleLogin() {
+    function loginSuccess() {
+      document.getElementById('loginPage').style.display = 'none';
+      document.getElementById('app').classList.add('active');
+      fetch('/api/account?action=log', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ activity: 'login', detail: 'User logged in' }),
+      }).catch(() => {});
+      loadData();
+    }
+
+    async function handleLogin() {
       const u = document.getElementById('loginUser').value.trim();
       const p = document.getElementById('loginPass').value;
       const err = document.getElementById('loginError');
+      err.textContent = '';
+
+      if (!u || !p) {
+        err.textContent = 'Please enter your credentials.';
+        return;
+      }
+
+      // Try hardcoded credentials first
       if (u === CREDS.user && p === CREDS.pass) {
-        document.getElementById('loginPage').style.display = 'none';
-        document.getElementById('app').classList.add('active');
-        fetch('/api/account?action=log', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ activity: 'login', detail: 'User logged in' }),
-        }).catch(() => {});
-        loadData();
-      } else {
+        loginSuccess();
+        return;
+      }
+
+      // Try Netlify Identity login (for users who signed up)
+      const btn = document.getElementById('loginBtn');
+      btn.disabled = true;
+      btn.textContent = 'Signing in...';
+      try {
+        const { login } = await import('https://esm.sh/@netlify/identity');
+        await login(u, p);
+        loginSuccess();
+      } catch (error) {
         err.textContent = 'Invalid username or password.';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Sign In';
       }
     }
 
@@ -1239,8 +1322,92 @@
       document.getElementById('loginError').textContent = '';
     }
 
+    // ---- SIGNUP (Netlify Identity) ----
+    function showSignupForm() {
+      document.getElementById('loginForm').classList.add('hidden');
+      document.getElementById('signupForm').classList.remove('hidden');
+      document.getElementById('signupError').textContent = '';
+      document.getElementById('signupSuccess').textContent = '';
+    }
+
+    function showLoginForm() {
+      document.getElementById('signupForm').classList.add('hidden');
+      document.getElementById('loginForm').classList.remove('hidden');
+      document.getElementById('loginError').textContent = '';
+    }
+
+    async function handleSignup() {
+      const name = document.getElementById('signupName').value.trim();
+      const email = document.getElementById('signupEmail').value.trim();
+      const password = document.getElementById('signupPass').value;
+      const errEl = document.getElementById('signupError');
+      const successEl = document.getElementById('signupSuccess');
+      errEl.textContent = '';
+      successEl.textContent = '';
+
+      if (!name || !email || !password) {
+        errEl.textContent = 'Please fill in all fields.';
+        return;
+      }
+      if (password.length < 6) {
+        errEl.textContent = 'Password must be at least 6 characters.';
+        return;
+      }
+
+      const btn = document.getElementById('signupBtn');
+      btn.disabled = true;
+      btn.textContent = 'Creating Account...';
+
+      try {
+        const { signup } = await import('https://esm.sh/@netlify/identity');
+        const user = await signup(email, password, { full_name: name });
+        if (user.emailVerified) {
+          successEl.textContent = 'Account created! You are now logged in.';
+          setTimeout(() => showLoginForm(), 2000);
+        } else {
+          successEl.textContent = 'Account created! Check your email to confirm.';
+        }
+        document.getElementById('signupName').value = '';
+        document.getElementById('signupEmail').value = '';
+        document.getElementById('signupPass').value = '';
+      } catch (error) {
+        if (error.status === 403) {
+          errEl.textContent = 'Signups are not currently allowed.';
+        } else if (error.status === 422) {
+          errEl.textContent = 'Invalid input. Check your email and password.';
+        } else {
+          errEl.textContent = error.message || 'Signup failed. Please try again.';
+        }
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Create Account';
+      }
+    }
+
+    // Handle auth callbacks (email confirmation, recovery, etc.)
+    (async function processAuthCallback() {
+      try {
+        const { handleAuthCallback } = await import('https://esm.sh/@netlify/identity');
+        const result = await handleAuthCallback();
+        if (!result) return;
+        if (result.type === 'confirmation') {
+          showLoginForm();
+          document.getElementById('loginError').textContent = '';
+          alert('Email confirmed! You can now sign in.');
+        }
+      } catch (e) {
+        // Ignore - no callback to process
+      }
+    })();
+
     document.addEventListener('keypress', e => {
-      if (e.key === 'Enter' && document.getElementById('loginPage').style.display !== 'none') handleLogin();
+      if (e.key === 'Enter' && document.getElementById('loginPage').style.display !== 'none') {
+        if (!document.getElementById('signupForm').classList.contains('hidden')) {
+          handleSignup();
+        } else {
+          handleLogin();
+        }
+      }
     });
 
     // ---- NAVIGATION ----

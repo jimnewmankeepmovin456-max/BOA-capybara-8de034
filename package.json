@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/jimnewmankeepmovin456-max/BOA-capybara-8de034#readme",
   "dependencies": {
-    "@netlify/blobs": "^10.7.4"
+    "@netlify/blobs": "^10.7.4",
+    "@netlify/identity": "^1.0.0"
   }
 }
