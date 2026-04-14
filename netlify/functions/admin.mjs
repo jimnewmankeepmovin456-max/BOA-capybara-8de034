@@ -60,23 +60,9 @@ export default async (req) => {
     return Response.json(encrypted);
   }
 
-  if (action === "transactions") {
-    const transactions = (await store.get("transactions", { type: "json" })) || [];
-    return Response.json(transactions);
-  }
-
-  if (action === "account") {
-    const account = (await store.get("account", { type: "json" })) || {};
-    return Response.json(account);
-  }
-
   if (action === "summary") {
-    const account = (await store.get("account", { type: "json" })) || {};
-    const transactions = (await store.get("transactions", { type: "json" })) || [];
     const activities = (await store.get("activities", { type: "json" })) || [];
     return Response.json({
-      account,
-      transactionCount: transactions.length,
       activityCount: activities.length,
       lastActivity: activities[0] || null,
     });

@@ -498,17 +498,7 @@
     <div class="admin-content">
 
       <!-- Summary -->
-      <div class="summary-grid">
-        <div class="summary-card">
-          <div class="label">Account Balance</div>
-          <div class="value" id="sumBalance">--</div>
-          <div class="sub">Current balance</div>
-        </div>
-        <div class="summary-card">
-          <div class="label">Transactions</div>
-          <div class="value" id="sumTxns">--</div>
-          <div class="sub">Total count</div>
-        </div>
+      <div class="summary-grid" style="grid-template-columns: repeat(2, 1fr);">
         <div class="summary-card">
           <div class="label">Activities</div>
           <div class="value" id="sumActs">--</div>
@@ -523,9 +513,7 @@
 
       <!-- Tabs -->
       <div class="admin-tabs">
-        <button class="active" onclick="showAdminPanel(0)" id="atab0">Activities</button>
-        <button onclick="showAdminPanel(1)" id="atab1">Transactions</button>
-        <button onclick="showAdminPanel(2)" id="atab2">Account Details</button>
+        <button class="active" id="atab0">Activity Logs</button>
       </div>
 
       <!-- Activities panel -->
@@ -539,21 +527,6 @@
         </div>
       </div>
 
-      <!-- Transactions panel -->
-      <div id="apanel1" class="admin-panel">
-        <h3 style="font-size:16px;margin-bottom:16px;">Transaction Records</h3>
-        <div class="data-table" id="transactionsTable">
-          <div class="loading">Loading transactions...</div>
-        </div>
-      </div>
-
-      <!-- Account panel -->
-      <div id="apanel2" class="admin-panel">
-        <h3 style="font-size:16px;margin-bottom:16px;">Account Information</h3>
-        <div class="data-table" id="accountTable">
-          <div class="loading">Loading account...</div>
-        </div>
-      </div>
     </div>
   </div>
 
@@ -561,8 +534,6 @@
     let adminToken = null;
     let showEncrypted = true;
     let cachedActivities = [];
-    let cachedTransactions = [];
-    let cachedAccount = {};
 
     function encryptText(text) {
       return text.split("").map(c => String.fromCharCode(c.charCodeAt(0) + 3)).join("");
@@ -609,7 +580,6 @@
     function showAdminPanel(n) {
       document.querySelectorAll(".admin-panel").forEach(p => p.classList.remove("active"));
       document.getElementById(`apanel${n}`).classList.add("active");
-      document.querySelectorAll(".admin-tabs button").forEach((b, i) => b.classList.toggle("active", i === n));
     }
 
     // Data loading
@@ -678,63 +648,16 @@
       container.innerHTML = html;
     }
 
-    function renderTransactions() {
-      const container = document.getElementById("transactionsTable");
-      if (!cachedTransactions.length) {
-        container.innerHTML = '<div class="empty-state">No transactions.</div>';
-        return;
-      }
-      let html = '<div class="data-table-header txn-grid"><span>Date</span><span>Description</span><span>Amount</span><span>Type</span></div>';
-      html += cachedTransactions.map(t => {
-        const isPositive = t.amount > 0;
-        return `<div class="data-table-row txn-grid">
-          <span style="font-size:12px;color:var(--text-secondary);">${fmtDate(t.date)}</span>
-          <span>${esc(t.description)}${t.paymentMethod ? ' <span class="tag tag-fee">' + esc(t.paymentMethod) + '</span>' : ''}${t.from ? ' <span style="color:var(--text-secondary);font-size:12px;">from ' + esc(t.from) + '</span>' : ''}</span>
-          <span class="${isPositive ? 'amount-positive' : 'amount-negative'}">${isPositive ? '+' : '-'}${fmt(t.amount)}</span>
-          <span><span class="tag ${getTypeTag(t.type)}">${esc(t.type)}</span></span>
-        </div>`;
-      }).join("");
-      container.innerHTML = html;
-    }
-
-    function renderAccount() {
-      const container = document.getElementById("accountTable");
-      const a = cachedAccount;
-      const fields = [
-        ["Account Holder", a.holder],
-        ["Account Number", a.accountNumber],
-        ["Routing Number", a.routingNumber],
-        ["Account Type", a.type],
-        ["Currency", a.currency],
-        ["Balance", fmt(a.balance || 0)],
-        ["Date Opened", a.opened],
-      ];
-      let html = '<div class="data-table-header" style="grid-template-columns:200px 1fr;display:grid;"><span>Field</span><span>Value</span></div>';
-      html += fields.map(([label, value]) => {
-        return `<div class="data-table-row" style="grid-template-columns:200px 1fr;display:grid;">
-          <span style="color:var(--text-secondary);">${esc(label)}</span>
-          <span style="font-weight:600;">${esc(String(value || "--"))}</span>
-        </div>`;
-      }).join("");
-      container.innerHTML = html;
-    }
-
     async function loadAdminData() {
       try {
-        const [summary, activities, transactions, account] = await Promise.all([
+        const [summary, activities] = await Promise.all([
           adminFetch("summary"),
           adminFetch("activities"),
-          adminFetch("transactions"),
-          adminFetch("account"),
         ]);
 
         cachedActivities = activities;
-        cachedTransactions = transactions;
-        cachedAccount = account;
 
         // Update summary
-        document.getElementById("sumBalance").textContent = fmt(summary.account?.balance || 0);
-        document.getElementById("sumTxns").textContent = summary.transactionCount || 0;
         document.getElementById("sumActs").textContent = summary.activityCount || 0;
         if (summary.lastActivity) {
           document.getElementById("sumLast").textContent = summary.lastActivity.action;
@@ -742,8 +665,6 @@
         }
 
         renderActivities();
-        renderTransactions();
-        renderAccount();
       } catch (e) {
         console.error("Failed to load admin data", e);
       }
